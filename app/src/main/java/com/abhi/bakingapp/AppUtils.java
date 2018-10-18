@@ -20,7 +20,7 @@ public class AppUtils {
 
     public static  AppUtils sInstance ;
 
-    public AppUtils getsInstance(){
+    public static AppUtils getsInstance(){
         if(sInstance == null) sInstance = new AppUtils();
         return sInstance;
     }
@@ -32,7 +32,7 @@ public class AppUtils {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "onResponse: recived the Recipe");
                     List<Recipe> recipes = response.body();
-                   SingletonClass.sInstance.setRecipes(recipes);
+                   SingletonClass.getsInstance().setRecipes(recipes);
                 } else {
 
                 }

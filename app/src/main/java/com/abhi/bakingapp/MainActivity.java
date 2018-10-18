@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
                 activeNetwork.isConnectedOrConnecting();
 
         if (isConnected) {
-            AppUtils.sInstance.makeRecipes();
+            AppUtils.getsInstance().makeRecipes();
         }else{
             Toast.makeText(this, "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
         }

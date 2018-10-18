@@ -12,7 +12,7 @@ public class SingletonClass {
     public static SingletonClass sInstance ;
     List<Recipe> recipes;
 
-    public SingletonClass getsInstance(){
+    public static SingletonClass getsInstance(){
         if(sInstance == null) sInstance = new SingletonClass();
         return sInstance;
     }
