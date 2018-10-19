@@ -1,6 +1,7 @@
 package com.abhi.bakingapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -14,11 +15,12 @@ import android.widget.Toast;
 import adapters.RecipeAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import interfaces.RecipeClickedListener;
 import interfaces.ResponseListener;
 import models.SingletonClass;
 
 public class MainActivity extends AppCompatActivity {
-
+    public static final String RECIPE_CLICKED = "recipe_clicked";
     private static final String TAG = MainActivity.class.getSimpleName();
     @BindView(R.id.recipe_reclerview_id) RecyclerView recyclerView;
     @BindView(R.id.main_activity_progressbar_id)
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.recycler_view_layout);
         ButterKnife.bind(this);
 
         //checking for the internet connectivity
@@ -56,7 +58,18 @@ public class MainActivity extends AppCompatActivity {
     public void setRecyclerViewAdapter(){
         LinearLayoutManager manager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(manager);
-        recipeAdapter = new RecipeAdapter(this, SingletonClass.getsInstance().getRecipes());
+        recipeAdapter = new RecipeAdapter(this, SingletonClass.getsInstance().getRecipes(), new RecipeClickedListener() {
+            @Override
+            public void onResponse(int position) {
+                openRecipeDetail(position);
+            }
+        });
         recyclerView.setAdapter(recipeAdapter);
+    }
+
+    public void openRecipeDetail(int position){
+        Intent intent = new Intent(MainActivity.this, RecipeDetails.class);
+        intent.putExtra(RECIPE_CLICKED,position);
+        startActivity(intent);
     }
 }
