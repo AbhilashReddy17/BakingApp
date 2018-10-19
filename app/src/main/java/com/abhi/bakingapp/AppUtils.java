@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.List;
 
+import interfaces.ResponseListener;
 import interfaces.RetroApi;
 import models.Recipe;
 import models.SingletonClass;
@@ -24,7 +25,7 @@ public class AppUtils {
         if(sInstance == null) sInstance = new AppUtils();
         return sInstance;
     }
-    public void makeRecipes(){
+    public void makeRecipes(final ResponseListener callback){
         RetroApi apiInterface = Controller.getClient().create(RetroApi.class);
         apiInterface.getRecipes().enqueue(new Callback<List<Recipe>>() {
             @Override
@@ -33,6 +34,7 @@ public class AppUtils {
                     Log.d(TAG, "onResponse: recived the Recipe");
                     List<Recipe> recipes = response.body();
                    SingletonClass.getsInstance().setRecipes(recipes);
+                   callback.onResponse();
                 } else {
 
                 }
