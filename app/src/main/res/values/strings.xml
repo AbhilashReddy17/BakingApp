@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">BakingApp</string>
     <string name="firstItem">Recipe Ingredients</string>
-    <string name="notfirstItem">Recipe Step %1$d \n</string>
+    <string name="notfirstItem">Recipe Step %1$d \n \n</string>
     <string name="movie_detail_activity">RecipeDetails</string>
+    <string name="quantity">Quantity</string>
+    <string name="measure">Measure</string>
+    <string name="ingredient">Ingredient</string>
 </resources>

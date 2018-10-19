@@ -1,6 +1,7 @@
 package adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,11 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.abhi.bakingapp.Ingredients;
 import com.abhi.bakingapp.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import models.Recipe;
+
+import static com.abhi.bakingapp.MainActivity.RECIPE_CLICKED;
 
 /**
  * Created by ABHI on 10/18/2018.
@@ -39,6 +43,14 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
 
         if(position == 0){
             holder.itemText.setText(context.getResources().getString(R.string.firstItem)); // first item always reserved for ingredients
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, Ingredients.class);
+                    intent.putExtra(RECIPE_CLICKED,recipe.getId()-1); // -1 because list starts with 0
+                    context.startActivity(intent);
+                }
+            });
         }else{
             holder.itemText.setText(context.getResources().getString(R.string.notfirstItem,position)
                     +recipe.getSteps().get(position-1).getShortDescription());
