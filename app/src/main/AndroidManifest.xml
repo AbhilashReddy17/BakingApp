@@ -23,11 +23,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RecipeDetails"
+            android:name=".RecipeDetailsFragment"
             android:label="@string/movie_detail_activity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".Ingredients"></activity>
+            android:screenOrientation="portrait" />
+        <activity android:name=".Ingredients" />
+        <activity android:name=".RecipeStep"></activity>
+
+        <receiver android:name=".RecipeStep$MediaReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

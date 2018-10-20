@@ -10,7 +10,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import models.SingletonClass;
 
-import static com.abhi.bakingapp.MainActivity.RECIPE_CLICKED;
+import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
 
 public class Ingredients extends AppCompatActivity {
 

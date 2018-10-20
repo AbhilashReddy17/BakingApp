@@ -19,8 +19,10 @@ import interfaces.RecipeClickedListener;
 import interfaces.ResponseListener;
 import models.SingletonClass;
 
+import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
+
 public class MainActivity extends AppCompatActivity {
-    public static final String RECIPE_CLICKED = "recipe_clicked";
+
     private static final String TAG = MainActivity.class.getSimpleName();
     @BindView(R.id.recipe_reclerview_id) RecyclerView recyclerView;
     @BindView(R.id.main_activity_progressbar_id)
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openRecipeDetail(int position){
-        Intent intent = new Intent(MainActivity.this, RecipeDetails.class);
+        Intent intent = new Intent(MainActivity.this, RecipeDetailsFragment.class);
         intent.putExtra(RECIPE_CLICKED,position);
         startActivity(intent);
     }
