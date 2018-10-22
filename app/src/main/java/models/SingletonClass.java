@@ -1,7 +1,5 @@
 package models;
 
-import com.abhi.bakingapp.AppUtils;
-
 import java.util.List;
 
 /**
@@ -11,10 +9,18 @@ import java.util.List;
 public class SingletonClass {
     public static SingletonClass sInstance ;
     List<Recipe> recipes;
-
+    int recipeClicked;
     public static SingletonClass getsInstance(){
         if(sInstance == null) sInstance = new SingletonClass();
         return sInstance;
+    }
+
+    public int getRecipeClicked() {
+        return recipeClicked;
+    }
+
+    public void setRecipeClicked(int recipeClicked) {
+        this.recipeClicked = recipeClicked;
     }
 
     public List<Recipe> getRecipes() {

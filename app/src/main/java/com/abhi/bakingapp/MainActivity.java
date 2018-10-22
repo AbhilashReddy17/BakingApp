@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openRecipeDetail(int position){
+
+        SingletonClass.getsInstance().setRecipeClicked(position);
         Intent intent = new Intent(MainActivity.this, RecipeDetailActivity.class);
         intent.putExtra(RECIPE_CLICKED,position);
         startActivity(intent);
