@@ -15,19 +15,36 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".RecipeDetails"
-            android:label="@string/movie_detail_activity"
-            android:screenOrientation="portrait"
-            />
-        <activity android:name=".Ingredients"></activity>
+
+        <receiver android:name="fragments.RecipeStepFragment$MediaReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".RecipeDetailActivity" />
+
+        <receiver android:name=".BakingRecipeWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/baking_recipe_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".BakingRecipeService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

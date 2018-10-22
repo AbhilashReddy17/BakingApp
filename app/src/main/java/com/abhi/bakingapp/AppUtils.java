@@ -1,5 +1,6 @@
 package com.abhi.bakingapp;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.util.List;
@@ -46,6 +47,14 @@ public class AppUtils {
 
             }
         });
+    }
+
+    public int getRecipeImage(String resName, Context context){
+
+       String drawableName = resName.toLowerCase(); //coverting all uppercase letters to lower case letters
+        drawableName =  drawableName.replaceAll(" ","_"); //replacing spaces with the _ as drawable folder name doesnt have spaces in our project we saved spaces with _
+        return  context.getResources().getIdentifier(drawableName,"drawable", context.getPackageName());
+
     }
 
 }
