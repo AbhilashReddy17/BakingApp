@@ -1,4 +1,4 @@
-package com.abhi.bakingapp;
+package fragments;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,13 +7,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.abhi.bakingapp.AppUtils;
+import com.abhi.bakingapp.R;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -37,10 +41,14 @@ import butterknife.ButterKnife;
 import models.Recipe;
 import models.SingletonClass;
 
+import static com.abhi.bakingapp.Constants.PLAYER_POSITION;
 import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
 import static com.abhi.bakingapp.Constants.RECIPE_STEP_CLICKED;
 
-public class RecipeStep extends AppCompatActivity implements ExoPlayer.EventListener {
+
+public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListener {
+
+    static RecipeStepFragment fragment;
 
     @BindView(R.id.playerView)
     SimpleExoPlayerView simpleExoPlayerView;
@@ -49,41 +57,72 @@ public class RecipeStep extends AppCompatActivity implements ExoPlayer.EventList
     private SimpleExoPlayer mExoPlayer;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
-    public static final String TAG = RecipeStep.class.getSimpleName();
+    public static final String TAG = RecipeStepFragment.class.getSimpleName();
 
     int recipeClicked;
     int recipeStepClicked;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipe_detail);
-        ButterKnife.bind(this);
+    long playerPosition = 0;
 
-        recipeClicked = getIntent().getIntExtra(RECIPE_CLICKED,0);
-        recipeStepClicked = getIntent().getIntExtra(RECIPE_STEP_CLICKED,0);
+    public RecipeStepFragment() {
+        // Required empty public constructor
+    }
+
+
+    public static RecipeStepFragment getInstance(int recipeClicked,int recipeStepClicked) {
+        fragment = new RecipeStepFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(RECIPE_CLICKED,recipeClicked);
+        bundle.putInt(RECIPE_STEP_CLICKED,recipeStepClicked);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.recipe_step_fragment, container, false);
+
+        ButterKnife.bind(this, view);
+
+        if (savedInstanceState != null) {
+            playerPosition = savedInstanceState.getLong(PLAYER_POSITION, 0);
+        }
+        recipeClicked = getArguments().getInt(RECIPE_CLICKED, 0);
+        recipeStepClicked = getArguments().getInt(RECIPE_STEP_CLICKED, 0);
 
         Recipe recipe = SingletonClass.getsInstance().getRecipes().get(recipeClicked); //getting the recipe selected
 
-        Bitmap thumbnail = BitmapFactory.decodeResource(getResources(),AppUtils.getsInstance().getRecipeImage(recipe.getName(),this));
+        Bitmap thumbnail = BitmapFactory.decodeResource(getResources(), AppUtils.getsInstance().getRecipeImage(recipe.getName(), getContext()));
         simpleExoPlayerView.setDefaultArtwork(thumbnail);
         Uri uri = Uri.parse(recipe.getSteps().get(recipeStepClicked).getVideoURL());
-        if(!(uri.getPath().equals(""))){
+        if (!(uri.getPath().equals(""))) {
             simpleExoPlayerView.setVisibility(View.VISIBLE);
             initializeMediaSession();
             initializePlayer(uri);
-        }else{
+        } else {
             simpleExoPlayerView.setVisibility(View.GONE);
         }
 
         stepDescription.setText(recipe.getSteps().get(recipeStepClicked).getDescription());
 
+        return view;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        long position = mExoPlayer.getCurrentPosition();
+        outState.putLong(PLAYER_POSITION, position);
+        super.onSaveInstanceState(outState);
 
     }
 
     private void initializeMediaSession() {
 
         // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(this, TAG);
+        mMediaSession = new MediaSessionCompat(getContext(), TAG);
 
         // Enable callbacks from MediaButtons and TransportControls.
         mMediaSession.setFlags(
@@ -105,7 +144,7 @@ public class RecipeStep extends AppCompatActivity implements ExoPlayer.EventList
 
 
         // MySessionCallback has methods that handle callbacks from a media controller.
-        mMediaSession.setCallback(new MySessionCallback());
+        mMediaSession.setCallback(new RecipeStepFragment.MySessionCallback());
 
         // Start the Media Session since the activity is active.
         mMediaSession.setActive(true);
@@ -117,20 +156,22 @@ public class RecipeStep extends AppCompatActivity implements ExoPlayer.EventList
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
+            mExoPlayer.seekTo(playerPosition);
             simpleExoPlayerView.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
 
             // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(this, "BakingApp");
+            String userAgent = Util.getUserAgent(getContext(), "BakingApp");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    this, userAgent), new DefaultExtractorsFactory(), null, null);
+                    getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
         }
     }
+
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest) {
@@ -149,10 +190,10 @@ public class RecipeStep extends AppCompatActivity implements ExoPlayer.EventList
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if((playbackState == ExoPlayer.STATE_READY) && playWhenReady){
+        if ((playbackState == ExoPlayer.STATE_READY) && playWhenReady) {
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mExoPlayer.getCurrentPosition(), 1f);
-        } else if((playbackState == ExoPlayer.STATE_READY)){
+        } else if ((playbackState == ExoPlayer.STATE_READY)) {
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                     mExoPlayer.getCurrentPosition(), 1f);
         }
@@ -214,11 +255,11 @@ public class RecipeStep extends AppCompatActivity implements ExoPlayer.EventList
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroyView() {
         if(mExoPlayer!=null) {
             releasePlayer();
             mMediaSession.setActive(false);
         }
-        super.onDestroy();
+        super.onDestroyView();
     }
 }

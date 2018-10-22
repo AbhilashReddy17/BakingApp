@@ -1,7 +1,6 @@
 package adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,16 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.abhi.bakingapp.Ingredients;
 import com.abhi.bakingapp.R;
-import com.abhi.bakingapp.RecipeStep;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import interfaces.RecipeStepClickedListener;
 import models.Recipe;
-
-import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
-import static com.abhi.bakingapp.Constants.RECIPE_STEP_CLICKED;
 
 /**
  * Created by ABHI on 10/18/2018.
@@ -27,9 +22,11 @@ import static com.abhi.bakingapp.Constants.RECIPE_STEP_CLICKED;
 public class RecipeDetailsFragmentAdapter extends RecyclerView.Adapter<RecipeDetailsFragmentAdapter.RecipeDetailHolder>{
     Recipe recipe;
     Context context;
-    public RecipeDetailsFragmentAdapter(Context context, Recipe recipe) {
+    RecipeStepClickedListener callback;
+    public RecipeDetailsFragmentAdapter(Context context, Recipe recipe,  RecipeStepClickedListener callback) {
         this.context = context;
         this.recipe = recipe;
+        this.callback = callback;
     }
 
     @NonNull
@@ -45,28 +42,22 @@ public class RecipeDetailsFragmentAdapter extends RecyclerView.Adapter<RecipeDet
 
         if(position == 0){
             holder.itemText.setText(context.getResources().getString(R.string.firstItem)); // first item always reserved for ingredients
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, Ingredients.class);
-                    intent.putExtra(RECIPE_CLICKED,recipe.getId()-1); // -1 because list starts with 0
-                    context.startActivity(intent);
-                }
-            });
         }else{
             holder.itemText.setText(context.getResources().getString(R.string.notfirstItem,position)
                     +recipe.getSteps().get(position-1).getShortDescription());
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, RecipeStep.class);
-                    intent.putExtra(RECIPE_CLICKED,recipe.getId()-1);
-                    intent.putExtra(RECIPE_STEP_CLICKED,position);
-
-                    context.startActivity(intent);
-                }
-            });
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onResponse(recipe.getId()-1,position);
+//                Intent intent = new Intent(context, RecipeStepFragment.class);
+//                intent.putExtra(RECIPE_CLICKED,recipe.getId()-1);
+//                intent.putExtra(RECIPE_STEP_CLICKED,position);
+//
+//                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
