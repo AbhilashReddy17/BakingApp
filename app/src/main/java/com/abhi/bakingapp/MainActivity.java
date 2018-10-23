@@ -2,6 +2,7 @@ package com.abhi.bakingapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
     @Nullable
     FrameLayout frameLayout;
     RecipeAdapter recipeAdapter;
+
+    RecipeWidgetBroadcastReceiver recipeWidgetBroadcastReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,10 +59,15 @@ public class MainActivity extends AppCompatActivity {
                     setRecyclerViewAdapter();
                 }
             });
+
+            recipeWidgetBroadcastReceiver = new RecipeWidgetBroadcastReceiver();
+
         }else{
             Toast.makeText(this, "Please check your internet connection and try again", Toast.LENGTH_SHORT).show();
         }
 
+        IntentFilter intentFilter = new IntentFilter(Constants.RECIPE_WIDGET_ACTION_FILTER);
+        registerReceiver(recipeWidgetBroadcastReceiver,intentFilter);
 
     }
 
@@ -81,6 +90,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openRecipeDetail(int position){
+
+        Intent brodcastIntent = new Intent(Constants.RECIPE_WIDGET_ACTION_FILTER);
+        Bundle extras = new Bundle();
+        extras.putInt(Constants.RECIPE_CLICKED, position);
+        brodcastIntent.putExtras(extras);
+        sendBroadcast(brodcastIntent);
 
         SingletonClass.getsInstance().setRecipeClicked(position);
         Intent intent = new Intent(MainActivity.this, RecipeDetailActivity.class);

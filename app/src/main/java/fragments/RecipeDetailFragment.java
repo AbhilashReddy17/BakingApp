@@ -11,10 +11,13 @@ import android.view.ViewGroup;
 import com.abhi.bakingapp.R;
 import com.abhi.bakingapp.RecipeDetailActivity;
 
+import java.util.List;
+
 import adapters.RecipeDetailsFragmentAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import interfaces.RecipeStepClickedListener;
+import models.Recipe;
 import models.SingletonClass;
 
 import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
@@ -61,14 +64,18 @@ public class RecipeDetailFragment extends Fragment {
         LinearLayoutManager manager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         if(recyclerView!=null){
             recyclerView.setLayoutManager(manager);
-            recipeDetailAdapter = new RecipeDetailsFragmentAdapter(getContext(),
-                    SingletonClass.getsInstance().getRecipes().get(recipePosition),new RecipeStepClickedListener(){
-                @Override
-                public void onResponse(int recipePosition, int recipeStepClicked) {
-                    callback.onResponse(recipePosition,recipeStepClicked);
-                }
-            });
-            recyclerView.setAdapter(recipeDetailAdapter);
+            List<Recipe> recipeList = SingletonClass.getsInstance().getRecipes();
+
+            if(recipeList != null){
+                recipeDetailAdapter = new RecipeDetailsFragmentAdapter(getContext(),
+                        recipeList.get(recipePosition),new RecipeStepClickedListener(){
+                    @Override
+                    public void onResponse(int recipePosition, int recipeStepClicked) {
+                        callback.onResponse(recipePosition,recipeStepClicked);
+                    }
+                });
+                recyclerView.setAdapter(recipeDetailAdapter);
+            }
 
         }
     }

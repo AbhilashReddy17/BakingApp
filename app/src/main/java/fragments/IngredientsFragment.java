@@ -11,9 +11,12 @@ import android.view.ViewGroup;
 
 import com.abhi.bakingapp.R;
 
+import java.util.List;
+
 import adapters.IngredientAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import models.Recipe;
 import models.SingletonClass;
 
 import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
@@ -47,9 +50,12 @@ public static IngredientsFragment getInstance(int recipeClicked){
         int recipePosition = getArguments().getInt(RECIPE_CLICKED);
         LinearLayoutManager manager = new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false);
         recyclerView.setLayoutManager(manager);
-        ingredientAdapter = new IngredientAdapter(getContext(), SingletonClass.getsInstance().getRecipes().get(recipePosition).getIngredients());
-        recyclerView.setAdapter(ingredientAdapter);
+        List<Recipe> recipeList = SingletonClass.getsInstance().getRecipes();
 
+        if(recipeList != null){
+            ingredientAdapter = new IngredientAdapter(getContext(), recipeList.get(recipePosition).getIngredients());
+            recyclerView.setAdapter(ingredientAdapter);
+        }
         return view;
     }
 

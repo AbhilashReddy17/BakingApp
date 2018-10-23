@@ -42,6 +42,7 @@ import models.Recipe;
 import models.SingletonClass;
 
 import static com.abhi.bakingapp.Constants.PLAYER_POSITION;
+import static com.abhi.bakingapp.Constants.PLAYER_STATE;
 import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
 import static com.abhi.bakingapp.Constants.RECIPE_STEP_CLICKED;
 
@@ -62,7 +63,8 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
     int recipeClicked;
     int recipeStepClicked;
     long playerPosition = 0;
-
+    boolean playerState;
+    Recipe recipe;
     public RecipeStepFragment() {
         // Required empty public constructor
     }
@@ -88,14 +90,24 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
 
         if (savedInstanceState != null) {
             playerPosition = savedInstanceState.getLong(PLAYER_POSITION, 0);
+            playerState = savedInstanceState.getBoolean(PLAYER_STATE);
         }
         recipeClicked = getArguments().getInt(RECIPE_CLICKED, 0);
         recipeStepClicked = getArguments().getInt(RECIPE_STEP_CLICKED, 0);
+         recipe = SingletonClass.getsInstance().getRecipes().get(recipeClicked); //getting the recipe selected
 
-        Recipe recipe = SingletonClass.getsInstance().getRecipes().get(recipeClicked); //getting the recipe selected
 
         Bitmap thumbnail = BitmapFactory.decodeResource(getResources(), AppUtils.getsInstance().getRecipeImage(recipe.getName(), getContext()));
         simpleExoPlayerView.setDefaultArtwork(thumbnail);
+
+        stepDescription.setText(recipe.getSteps().get(recipeStepClicked).getDescription());
+
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         Uri uri = Uri.parse(recipe.getSteps().get(recipeStepClicked).getVideoURL());
         if (!(uri.getPath().equals(""))) {
             simpleExoPlayerView.setVisibility(View.VISIBLE);
@@ -105,16 +117,23 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
             simpleExoPlayerView.setVisibility(View.GONE);
         }
 
-        stepDescription.setText(recipe.getSteps().get(recipeStepClicked).getDescription());
-
-        return view;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if(mExoPlayer!=null) {
+            releasePlayer();
+            mMediaSession.setActive(false);
+        }
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         long position = mExoPlayer.getCurrentPosition();
+        boolean player_state = mExoPlayer.getPlayWhenReady();
         outState.putLong(PLAYER_POSITION, position);
+        outState.putBoolean(PLAYER_STATE,player_state);
         super.onSaveInstanceState(outState);
 
     }
@@ -152,14 +171,14 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
     }
 
     private void initializePlayer(Uri mediaUri) {
+
         if (mExoPlayer == null) {
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
-            mExoPlayer.seekTo(playerPosition);
             simpleExoPlayerView.setPlayer(mExoPlayer);
-
+            mExoPlayer.seekTo(playerPosition);
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
 
@@ -168,7 +187,7 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(playerState);
         }
     }
 
@@ -256,10 +275,7 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
 
     @Override
     public void onDestroyView() {
-        if(mExoPlayer!=null) {
-            releasePlayer();
-            mMediaSession.setActive(false);
-        }
+
         super.onDestroyView();
     }
 }

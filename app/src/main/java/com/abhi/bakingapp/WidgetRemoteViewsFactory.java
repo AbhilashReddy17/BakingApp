@@ -42,12 +42,15 @@ public class WidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsF
 
     private void updateWidgetListView()
     {
-        ingredients = recipe.getIngredients();
-        List<String> ingredientsInList = new ArrayList<>();
-        for(Ingredient ingredient :ingredients){
-            ingredientsInList.add(ingredient.getIngredient());
+        if(recipe != null){
+            ingredients = recipe.getIngredients();
+            List<String> ingredientsInList = new ArrayList<>();
+            for(Ingredient ingredient :ingredients){
+                ingredientsInList.add(ingredient.getIngredient());
+            }
+            this.ingredientsInList = ingredientsInList;
         }
-        this.ingredientsInList = ingredientsInList;
+
     }
     @Override
     public void onCreate() {

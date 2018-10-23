@@ -8,12 +8,16 @@ import java.util.List;
 
 public class SingletonClass {
     public static SingletonClass sInstance ;
+
+
     List<Recipe> recipes;
     int recipeClicked;
+
     public static SingletonClass getsInstance(){
         if(sInstance == null) sInstance = new SingletonClass();
         return sInstance;
     }
+
 
     public int getRecipeClicked() {
         return recipeClicked;

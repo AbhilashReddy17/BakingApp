@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -28,6 +29,8 @@ public class MainActivityTest {
 
         //clicking the first element in the recycler view
         onView(withId(R.id.recipe_reclerview_id)).perform(RecyclerViewActions.scrollToPosition(0));
+        onView(withId(R.id.recipe_reclerview_id)).perform(RecyclerViewActions.scrollToPosition(1)).perform(click());
+
 
         //checking for the id of recyclerview from recipe detail fragment is displayed which makes sure that fragment has been loaded
         onView(withId(R.id.recipe_reclerview_id)).check(matches(isDisplayed()));
