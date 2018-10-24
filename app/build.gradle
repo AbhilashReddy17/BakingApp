@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.abhi.bakingapp"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -53,5 +53,11 @@ dependencies {
 
     implementation "com.jakewharton:butterknife:8.5.1"
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+
+    //for exoplayer preview
+    // Base implementation with a standard SeekBar
+    implementation 'com.github.rubensousa:previewseekbar:2.0.0'
+    // ExoPlayer extension that contains a TimeBar.
+    implementation 'com.github.rubensousa:previewseekbar-exoplayer:2.8.1.0'
 
 }

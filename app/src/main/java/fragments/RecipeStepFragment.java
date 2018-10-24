@@ -38,6 +38,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import interfaces.PreviewLoader;
 import models.Recipe;
 import models.SingletonClass;
 
@@ -47,7 +48,7 @@ import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
 import static com.abhi.bakingapp.Constants.RECIPE_STEP_CLICKED;
 
 
-public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListener {
+public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListener, PreviewLoader {
 
     static RecipeStepFragment fragment;
 
@@ -101,6 +102,7 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
         simpleExoPlayerView.setDefaultArtwork(thumbnail);
 
         stepDescription.setText(recipe.getSteps().get(recipeStepClicked).getDescription());
+
 
         return view;
     }
@@ -231,6 +233,17 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public void onPositionDiscontinuity() {
 
+    }
+
+    @Override
+    public void loadPreview(long currentPosition, long max) {
+        mExoPlayer.setPlayWhenReady(false);
+//        GlideApp.with(imageView)
+//                .load(thumbnailsUrl)
+//                .override(GlideThumbnailTransformation.IMAGE_WIDTH,
+//                        GlideThumbnailTransformation.IMAGE_HEIGHT)
+//                .transform(new GlideThumbnailTransformation(currentPosition))
+//                .into(imageView);
     }
 
     /**
