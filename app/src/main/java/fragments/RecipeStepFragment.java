@@ -130,9 +130,13 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        long position = mExoPlayer.getCurrentPosition();
-        boolean player_state = mExoPlayer.getPlayWhenReady();
-        outState.putLong(PLAYER_POSITION, position);
+        long position;
+        boolean player_state = false;
+        if(mExoPlayer !=null) {
+            position = mExoPlayer.getCurrentPosition();
+            outState.putLong(PLAYER_POSITION, position);
+             player_state = mExoPlayer.getPlayWhenReady();
+        }
         outState.putBoolean(PLAYER_STATE,player_state);
         super.onSaveInstanceState(outState);
 
