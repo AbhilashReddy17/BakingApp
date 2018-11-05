@@ -1,5 +1,6 @@
 package com.abhi.bakingapp;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -13,8 +14,8 @@ import fragments.IngredientsFragment;
 import fragments.RecipeDetailFragment;
 import fragments.RecipeStepFragment;
 import interfaces.RecipeStepClickedListener;
-import models.SingletonClass;
 
+import static com.abhi.bakingapp.Constants.PLAYER_POSITION;
 import static com.abhi.bakingapp.Constants.RECIPE_CLICKED;
 import static com.abhi.bakingapp.Constants.RECIPE_STEP_CLICKED;
 
@@ -25,6 +26,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeSte
     @BindView(R.id.framelayout_recipestep_container)
     @Nullable
     FrameLayout recipeStepFragmentContainer;
+    @BindView(R.id.framelayout_container)
+    @Nullable
+    FrameLayout recipeDetailContainer;
+
 
     @BindView(R.id.my_toolbar)
     Toolbar toolbarBackbutton;
@@ -32,12 +37,15 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeSte
     int recipeClicked;
     int recipeStepClicked;
     boolean checkScrenRotation;
+    SharedPreferences pref;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recipe_details_activity_layout);
         ButterKnife.bind(this);
-
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
 
         if(savedInstanceState != null){
             checkScrenRotation = true;
@@ -68,10 +76,27 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeSte
                 if(recipeStepClicked==0){
                     setIngredientsFragment(recipeClicked);
                 }else{
-                    RecipeStepFragment recipeStepFragment = RecipeStepFragment.getInstance(recipeClicked,recipeStepClicked);
+                    RecipeStepFragment recipeStepFragment = RecipeStepFragment.getInstance(recipeClicked,recipeStepClicked,0);
                     getSupportFragmentManager().beginTransaction().replace(R.id.framelayout_recipestep_container,recipeStepFragment).commit();
                 }
 
+            }
+
+        }else{
+            RecipeDetailFragment recipeDetailFragment = RecipeDetailFragment.getInstance(recipeClicked);
+            long playerPosition = pref.getLong(PLAYER_POSITION,0);
+            RecipeStepFragment recipeStepFragment = RecipeStepFragment.getInstance(recipeClicked,recipeStepClicked,playerPosition);
+
+            if(recipeDetailContainer !=null && recipeStepFragmentContainer != null){
+                getSupportFragmentManager().beginTransaction().replace(R.id.framelayout_container,recipeDetailFragment).commit();
+                //loading first RecipeDetail object which is ingredient
+                if(recipeStepClicked==0){
+                    setIngredientsFragment(recipeClicked);
+                }else{
+                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout_recipestep_container,recipeStepFragment).commit();
+                }
+            }else{
+                getSupportFragmentManager().beginTransaction().replace(R.id.framelayout_container,recipeStepFragment).commit();
             }
 
         }
@@ -109,9 +134,11 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeSte
         outState.putInt(RECIPE_CLICKED,recipeClicked);
         outState.putInt(RECIPE_STEP_CLICKED,recipeStepClicked);
         int count = getSupportFragmentManager().getBackStackEntryCount();
-        if(count>0){
-            getSupportFragmentManager().popBackStack();
-        }
+
+
+//        if(count>0){
+//            getSupportFragmentManager().popBackStack();
+//        }
         super.onSaveInstanceState(outState);
     }
 
@@ -125,7 +152,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeSte
 
         }else{
             //clicked recipe step
-            RecipeStepFragment recipeStepFragment = RecipeStepFragment.getInstance(recipePosition,recipeStepClicked);
+            RecipeStepFragment recipeStepFragment = RecipeStepFragment.getInstance(recipePosition,recipeStepClicked,0);
             if(recipeStepFragmentContainer != null){
                 getSupportFragmentManager().beginTransaction().replace(R.id.framelayout_recipestep_container,recipeStepFragment,RecipeStepFragment.TAG).commit();
             }else{

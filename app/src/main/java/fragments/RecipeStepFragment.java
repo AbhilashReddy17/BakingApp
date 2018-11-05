@@ -3,6 +3,7 @@ package fragments;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -66,16 +67,19 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
     long playerPosition = 0;
     boolean playerState;
     Recipe recipe;
+    SharedPreferences pref;
+    SharedPreferences.Editor editor;
     public RecipeStepFragment() {
         // Required empty public constructor
     }
 
 
-    public static RecipeStepFragment getInstance(int recipeClicked,int recipeStepClicked) {
+    public static RecipeStepFragment getInstance(int recipeClicked,int recipeStepClicked,long playerPosition) {
         fragment = new RecipeStepFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(RECIPE_CLICKED,recipeClicked);
         bundle.putInt(RECIPE_STEP_CLICKED,recipeStepClicked);
+        bundle.putLong(PLAYER_POSITION,playerPosition);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -88,11 +92,13 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
         View view = LayoutInflater.from(getContext()).inflate(R.layout.recipe_step_fragment, container, false);
 
         ButterKnife.bind(this, view);
-
+         pref = getActivity().getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        editor = pref.edit();
         if (savedInstanceState != null) {
             playerPosition = savedInstanceState.getLong(PLAYER_POSITION, 0);
             playerState = savedInstanceState.getBoolean(PLAYER_STATE);
         }
+        playerPosition = getArguments().getLong(PLAYER_POSITION,0);
         recipeClicked = getArguments().getInt(RECIPE_CLICKED, 0);
         recipeStepClicked = getArguments().getInt(RECIPE_STEP_CLICKED, 0);
          recipe = SingletonClass.getsInstance().getRecipes().get(recipeClicked); //getting the recipe selected
@@ -137,6 +143,8 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
         if(mExoPlayer !=null) {
             position = mExoPlayer.getCurrentPosition();
             outState.putLong(PLAYER_POSITION, position);
+            editor.putLong(PLAYER_POSITION,position);
+            editor.commit();
              player_state = mExoPlayer.getPlayWhenReady();
         }
         outState.putBoolean(PLAYER_STATE,player_state);
@@ -290,9 +298,10 @@ public class RecipeStepFragment extends Fragment implements ExoPlayer.EventListe
         mExoPlayer = null;
     }
 
+
+
     @Override
     public void onDestroyView() {
-
         super.onDestroyView();
     }
 }
